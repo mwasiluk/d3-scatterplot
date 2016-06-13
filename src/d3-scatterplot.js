@@ -6,10 +6,10 @@ function D3ScatterPlot(placeholderSelector, data, config){
         width: null,
         height: null,
         margin:{
-            left: 30,
+            left: 50,
             right: 30,
             top: 30,
-            bottom: 30
+            bottom: 50
         },
         x:{// X axis config
             label: 'X', // axis label
@@ -20,6 +20,9 @@ function D3ScatterPlot(placeholderSelector, data, config){
             label: 'Y', // axis label
             value: function(d) { return d[1] }, // y value accessor
             orient: "left"
+        },
+        dot:{
+            radius: 2
         }
     };
 
@@ -95,9 +98,9 @@ D3ScatterPlot.prototype.drawAxisX = function (){
         .call(plot.x.axis)
         .append("text")
         .attr("class", "mw-label")
-        .attr("x", plot.width)
-        .attr("y", -6)
-        .style("text-anchor", "end")
+        .attr("transform", "translate("+ (plot.width/2) +","+ (self.config.margin.bottom) +")")  // text is drawn off the screen top left, move down and out and rotate
+        .attr("dy", "-1em")
+        .style("text-anchor", "middle")
         .text(axisConf.label);
 };
 
@@ -110,10 +113,9 @@ D3ScatterPlot.prototype.drawAxisY = function (){
         .call(plot.y.axis)
         .append("text")
         .attr("class", "mw-label")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
+        .attr("transform", "translate("+ -self.config.margin.left +","+(plot.height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
         .text(axisConf.label);
 };
 
@@ -148,7 +150,7 @@ D3ScatterPlot.prototype.drawDots = function (){
         .data(data)
         .enter().append("circle")
         .attr("class", "mw-dot")
-        .attr("r", 3.5)
+        .attr("r", self.config.dot.radius)
         .attr("cx", plot.x.map)
         .attr("cy", plot.y.map);
         // .style("fill", function(d) { return color(cValue(d));})
