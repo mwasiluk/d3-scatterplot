@@ -5,5 +5,3 @@ svg.mw-d3-scatterplot {
     fill: none;
     stroke: #000;
     shape-rendering: crispEdges; }
-  svg.mw-d3-scatterplot .mw-dot {
-    stroke: #000; }

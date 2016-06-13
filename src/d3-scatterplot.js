@@ -22,7 +22,9 @@ function D3ScatterPlot(placeholderSelector, data, config){
             orient: "left"
         },
         dot:{
-            radius: 2
+            radius: 2,
+            color: function(d) { return d[0]*d[1] }, // string or function returning color's value for color scale
+            d3ColorCategory: 'category10'
         }
     };
 
@@ -46,16 +48,40 @@ D3ScatterPlot.prototype.setConfig = function (config){
     return this;
 };
 D3ScatterPlot.prototype.initPlot = function (){
+    var self=this;
     var margin = this.config.margin;
+    var conf = this.config;
     this.plot={
         x: {},
-        y: {}
+        y: {},
+        dot: {
+            color: null//color scale mapping function
+        }
     };
-    this.plot.width = this.config.width - margin.left - margin.right;
-    this.plot.height = this.config.height - margin.top - margin.bottom;
+
+    this.plot.width = conf.width - margin.left - margin.right;
+    this.plot.height = conf.height - margin.top - margin.bottom;
 
     this.setupX();
     this.setupY();
+
+    if(conf.dot.d3ColorCategory){
+        this.plot.dot.colorCategory = d3.scale[conf.dot.d3ColorCategory]();
+    }
+    var colorValue = conf.dot.color;
+    if(colorValue){
+        this.plot.dot.colorValue = colorValue;
+
+        if (typeof colorValue === 'string' || colorValue instanceof String){
+            this.plot.dot.color = colorValue;
+        }else if(this.plot.dot.colorCategory){
+            this.plot.dot.color = function(d){
+                return self.plot.dot.colorCategory(self.plot.dot.colorValue(d));
+            }
+        }
+
+
+    }
 
     return this;
 };
@@ -82,12 +108,33 @@ D3ScatterPlot.prototype.setupX = function (){
 
 };
 
+D3ScatterPlot.prototype.setupY = function (){
+
+    var plot = this.plot;
+    var y = plot.y;
+    var conf = this.config.y;
+
+    /*
+     * value accessor - returns the value to encode for a given data object.
+     * scale - maps value to a visual display encoding, such as a pixel position.
+     * map function - maps from data value to display value
+     * axis - sets up axis
+     */
+    y.value = conf.value;
+    y.scale = d3.scale.linear().range([plot.height, 0]);
+    y.map = function(d) { return y.scale(y.value(d));};
+    y.axis = d3.svg.axis().scale(y.scale).orient(conf.orient);
+
+
+    var data = this.data;
+    plot.y.scale.domain([d3.min(data, plot.y.value)-1, d3.max(data, plot.y.value)+1]);
+};
+
 D3ScatterPlot.prototype.drawPlot = function (){
     this.drawAxisX();
     this.drawAxisY();
     this.drawDots();
 };
-
 D3ScatterPlot.prototype.drawAxisX = function (){
     var self = this;
     var plot = self.plot;
@@ -119,41 +166,22 @@ D3ScatterPlot.prototype.drawAxisY = function (){
         .text(axisConf.label);
 };
 
-D3ScatterPlot.prototype.setupY = function (){
-
-    var plot = this.plot;
-    var y = plot.y;
-    var conf = this.config.y;
-
-    /*
-     * value accessor - returns the value to encode for a given data object.
-     * scale - maps value to a visual display encoding, such as a pixel position.
-     * map function - maps from data value to display value
-     * axis - sets up axis
-     */
-    y.value = conf.value;
-    y.scale = d3.scale.linear().range([0, plot.height]);
-    y.map = function(d) { return y.scale(y.value(d));};
-    y.axis = d3.svg.axis().scale(y.scale).orient(conf.orient);
-
-
-    var data = this.data;
-    plot.y.scale.domain([d3.min(data, plot.y.value)-1, d3.max(data, plot.y.value)+1]);
-};
-
 
 D3ScatterPlot.prototype.drawDots = function (){
     var self = this;
     var plot = self.plot;
     var data = this.data;
-    self.svg.selectAll(".mw-dot")
+    var dots = self.svg.selectAll(".mw-dot")
         .data(data)
         .enter().append("circle")
         .attr("class", "mw-dot")
         .attr("r", self.config.dot.radius)
         .attr("cx", plot.x.map)
         .attr("cy", plot.y.map);
-        // .style("fill", function(d) { return color(cValue(d));})
+
+    if(plot.dot.color){
+        dots.style("fill", plot.dot.color)
+    }
 
 };
 
