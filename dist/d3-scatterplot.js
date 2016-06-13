@@ -118,11 +118,11 @@ D3ScatterPlot.prototype.drawAxisX = function (){
     var plot = self.plot;
     var axisConf = this.config.x;
     self.svg.append("g")
-        .attr("class", "x-axis")
+        .attr("class", "mw-axis mw-axis-x")
         .attr("transform", "translate(0," + plot.height + ")")
         .call(plot.x.axis)
         .append("text")
-        .attr("class", "label")
+        .attr("class", "mw-label")
         .attr("x", plot.width)
         .attr("y", -6)
         .style("text-anchor", "end")
@@ -134,10 +134,10 @@ D3ScatterPlot.prototype.drawAxisY = function (){
     var plot = self.plot;
     var axisConf = this.config.y;
     self.svg.append("g")
-        .attr("class", "y-axis")
+        .attr("class", "mw-axis mw-axis-y")
         .call(plot.y.axis)
         .append("text")
-        .attr("class", "label")
+        .attr("class", "mw-label")
         .attr("transform", "rotate(-90)")
         .attr("y", 6)
         .attr("dy", ".71em")
@@ -172,10 +172,10 @@ D3ScatterPlot.prototype.drawDots = function (){
     var self = this;
     var plot = self.plot;
     var data = this.data;
-    self.svg.selectAll(".dot")
+    self.svg.selectAll(".mw-dot")
         .data(data)
         .enter().append("circle")
-        .attr("class", "dot")
+        .attr("class", "mw-dot")
         .attr("r", 3.5)
         .attr("cx", plot.x.map)
         .attr("cy", plot.y.map);
@@ -190,6 +190,7 @@ D3ScatterPlot.prototype.initSvg = function (){
     self.svg = d3.select(self.placeholderSelector).append("svg")
         .attr("width", config.width)
         .attr("height", config.height)
+        .attr("class", "mw-d3-scatterplot")
         .append("g")
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")");
 };

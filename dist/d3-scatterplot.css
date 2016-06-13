@@ -1,2 +1,9 @@
-.mw-d3-scatterplot {
-  background-color: white; }
+svg.mw-d3-scatterplot {
+  background-color: white;
+  font-size: 11px; }
+  svg.mw-d3-scatterplot .mw-axis path, svg.mw-d3-scatterplot .mw-axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges; }
+  svg.mw-d3-scatterplot .mw-dot {
+    stroke: #000; }
