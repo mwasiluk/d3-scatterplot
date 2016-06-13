@@ -1,0 +1,23 @@
+{
+  "name": "d3-scatterplot",
+  "version": "1.0.0",
+  "description": "d3 scatterplot",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mwasiluk/d3-scatterplot.git"
+  },
+  "keywords": [
+    "d3",
+    "scatterplot"
+  ],
+  "author": "Michal Wasiluk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mwasiluk/d3-scatterplot/issues"
+  },
+  "homepage": "https://github.com/mwasiluk/d3-scatterplot#readme"
+}

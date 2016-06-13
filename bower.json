@@ -1,0 +1,21 @@
+{
+  "name": "d3-scatterplot",
+  "homepage": "https://github.com/mwasiluk/d3-scatterplot",
+  "authors": [
+    "Michal Wasiluk"
+  ],
+  "description": "",
+  "main": "",
+  "keywords": [
+    "scatterplot",
+    "d3"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
