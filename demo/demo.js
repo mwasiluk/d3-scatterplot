@@ -1,6 +1,6 @@
 var conf = {
-    width: 500,
-    height: 500,
+    // width: 500,
+    // height: 500,
     dot:{
         // color: 'red'
     }

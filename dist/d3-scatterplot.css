@@ -1,6 +1,7 @@
 svg.mw-d3-scatterplot {
   background-color: white;
-  font-size: 11px; }
+  font-size: 11px;
+  height: 100%; }
   svg.mw-d3-scatterplot .mw-axis path, svg.mw-d3-scatterplot .mw-axis line {
     fill: none;
     stroke: #000;

@@ -31,8 +31,8 @@ function D3ScatterPlot(placeholderSelector, data, config){
     this.placeholderSelector = placeholderSelector;
     this.svg=null;
     this.defaultConfig = {
-        width: null,
-        height: null,
+        width: 0,
+        height: 0,
         margin:{
             left: 50,
             right: 30,
@@ -87,8 +87,19 @@ D3ScatterPlot.prototype.initPlot = function (){
         }
     };
 
-    this.plot.width = conf.width - margin.left - margin.right;
-    this.plot.height = conf.height - margin.top - margin.bottom;
+    var width = conf.width;
+    var placeholderNode = d3.select(this.placeholderSelector).node();
+
+    if(!width){
+        width =placeholderNode.getBoundingClientRect().width;
+    }
+    var height = conf.height;
+    if(!height){
+        height =placeholderNode.getBoundingClientRect().height;
+    }
+
+    this.plot.width = width - margin.left - margin.right;
+    this.plot.height = height - margin.top - margin.bottom;
 
     this.setupX();
     this.setupY();
@@ -167,7 +178,7 @@ D3ScatterPlot.prototype.drawAxisX = function (){
     var self = this;
     var plot = self.plot;
     var axisConf = this.config.x;
-    self.svg.append("g")
+    self.svgG.append("g")
         .attr("class", "mw-axis mw-axis-x")
         .attr("transform", "translate(0," + plot.height + ")")
         .call(plot.x.axis)
@@ -183,7 +194,7 @@ D3ScatterPlot.prototype.drawAxisY = function (){
     var self = this;
     var plot = self.plot;
     var axisConf = this.config.y;
-    self.svg.append("g")
+    self.svgG.append("g")
         .attr("class", "mw-axis mw-axis-y")
         .call(plot.y.axis)
         .append("text")
@@ -199,7 +210,7 @@ D3ScatterPlot.prototype.drawDots = function (){
     var self = this;
     var plot = self.plot;
     var data = this.data;
-    var dots = self.svg.selectAll(".mw-dot")
+    var dots = self.svgG.selectAll(".mw-dot")
         .data(data)
         .enter().append("circle")
         .attr("class", "mw-dot")
@@ -217,18 +228,33 @@ D3ScatterPlot.prototype.initSvg = function (){
     var self = this;
     var config = this.config;
 
+
+
+    var width = self.plot.width+ config.margin.left + config.margin.right;
+    var height =  self.plot.height+ config.margin.top + config.margin.bottom;
+    var aspect = width / height;
     self.svg = d3.select(self.placeholderSelector).append("svg")
-        .attr("width", config.width)
-        .attr("height", config.height)
-        .attr("class", "mw-d3-scatterplot")
-        .append("g")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("viewBox", "0 0 "+" "+width+" "+height)
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("class", "mw-d3-scatterplot");
+    self.svgG = self.svg.append("g")
         .attr("transform", "translate(" + config.margin.left + "," + config.margin.top + ")");
+
+    if(!config.width || config.height ){
+        d3.select(window)
+            .on("resize", function() {
+                //TODO add responsiveness if width/height not specified
+            });
+    }
+
 };
 
 D3ScatterPlot.prototype.init = function (){
     var self = this;
-    self.initSvg();
     self.initPlot();
+    self.initSvg();
     self.drawPlot();
 
 };
