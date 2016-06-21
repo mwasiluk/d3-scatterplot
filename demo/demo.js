@@ -17,4 +17,3 @@ var data = [
 
 ];
 var plot = new D3ScatterPlot("#scatterplot", data, conf);
-plot.init();

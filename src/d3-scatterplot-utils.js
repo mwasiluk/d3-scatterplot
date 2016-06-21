@@ -3,7 +3,13 @@ function D3ScatterPlotUtils(){}
 // usage example deepExtend({}, objA, objB); => should work similar to $.extend(true, {}, objA, objB);
 D3ScatterPlotUtils.prototype.deepExtend = function(out) { //TODO consider using jquery / lo-dash / underscore / ECMA6 ; fallbacks?
 
-    var utils =this;
+    var utils = this;
+    var emptyOut = {};
+
+
+    if (!out && arguments.length > 1 && arguments[1] instanceof Array) {
+        out = [];
+    }
     out = out || {};
 
     for (var i = 1; i < arguments.length; i++) {

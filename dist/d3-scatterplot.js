@@ -3,7 +3,13 @@ function D3ScatterPlotUtils(){}
 // usage example deepExtend({}, objA, objB); => should work similar to $.extend(true, {}, objA, objB);
 D3ScatterPlotUtils.prototype.deepExtend = function(out) { //TODO consider using jquery / lo-dash / underscore / ECMA6 ; fallbacks?
 
-    var utils =this;
+    var utils = this;
+    var emptyOut = {};
+
+
+    if (!out && arguments.length > 1 && arguments[1] instanceof Array) {
+        out = [];
+    }
     out = out || {};
 
     for (var i = 1; i < arguments.length; i++) {
@@ -63,6 +69,8 @@ function D3ScatterPlot(placeholderSelector, data, config){
     if(config){
         this.setConfig(config);
     }
+
+    this.init();
 
 }
 
@@ -169,10 +177,10 @@ D3ScatterPlot.prototype.setupY = function (){
     plot.y.scale.domain([d3.min(data, plot.y.value)-1, d3.max(data, plot.y.value)+1]);
 };
 
-D3ScatterPlot.prototype.drawPlot = function (){
+D3ScatterPlot.prototype.draw = function (){
     this.drawAxisX();
     this.drawAxisY();
-    this.drawDots();
+    this.update();
 };
 D3ScatterPlot.prototype.drawAxisX = function (){
     var self = this;
@@ -206,30 +214,32 @@ D3ScatterPlot.prototype.drawAxisY = function (){
 };
 
 
-D3ScatterPlot.prototype.drawDots = function (){
+D3ScatterPlot.prototype.update = function (){
     var self = this;
     var plot = self.plot;
     var data = this.data;
     var dots = self.svgG.selectAll(".mw-dot")
-        .data(data)
-        .enter().append("circle")
-        .attr("class", "mw-dot")
-        .attr("r", self.config.dot.radius)
+        .data(data);
+
+    dots.enter().append("circle")
+        .attr("class", "mw-dot");
+
+
+    dots.attr("r", self.config.dot.radius)
         .attr("cx", plot.x.map)
         .attr("cy", plot.y.map);
 
     if(plot.dot.color){
         dots.style("fill", plot.dot.color)
     }
+    dots.exit().remove();
 
 };
 
 D3ScatterPlot.prototype.initSvg = function (){
     var self = this;
     var config = this.config;
-
-
-
+    
     var width = self.plot.width+ config.margin.left + config.margin.right;
     var height =  self.plot.height+ config.margin.top + config.margin.bottom;
     var aspect = width / height;
@@ -255,7 +265,7 @@ D3ScatterPlot.prototype.init = function (){
     var self = this;
     self.initPlot();
     self.initSvg();
-    self.drawPlot();
+    self.draw();
 
 };
 
