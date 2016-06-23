@@ -3,6 +3,9 @@ var conf = {
     // height: 500,
     dot:{
         // color: 'red'
+    },
+    x:{
+        // scale: "log"
     }
 };
 var data = [
@@ -17,3 +20,4 @@ var data = [
 
 ];
 var plot = new D3ScatterPlot("#scatterplot", data, conf);
+

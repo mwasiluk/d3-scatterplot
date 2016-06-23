@@ -1,29 +1,34 @@
 function D3ScatterPlotUtils(){}
 
 // usage example deepExtend({}, objA, objB); => should work similar to $.extend(true, {}, objA, objB);
-D3ScatterPlotUtils.prototype.deepExtend = function(out) { //TODO consider using jquery / lo-dash / underscore / ECMA6 ; fallbacks?
+D3ScatterPlotUtils.prototype.deepExtend = function (out) {
 
     var utils = this;
     var emptyOut = {};
 
 
-    if (!out && arguments.length > 1 && arguments[1] instanceof Array) {
+    if (!out && arguments.length > 1 && Array.isArray(arguments[1])) {
         out = [];
     }
     out = out || {};
 
     for (var i = 1; i < arguments.length; i++) {
-        var obj = arguments[i];
-
-        if (!obj)
+        var source = arguments[i];
+        if (!source)
             continue;
 
-        for (var key in obj) {
-            if (obj.hasOwnProperty(key)) {
-                if (typeof obj[key] === 'object')
-                    out[key] = utils.deepExtend(out[key], obj[key]);
-                else
-                    out[key] = obj[key];
+        for (var key in source) {
+            if (!source.hasOwnProperty(key)) {
+                continue;
+            }
+            var isArray = Array.isArray(out[key]);
+            var isObject = utils.isObject(out[key]);
+            var srcObj = utils.isObject(source[key]);
+
+            if (isObject && !isArray && srcObj) {
+                utils.deepExtend(out[key], source[key]);
+            } else {
+                out[key] = source[key];
             }
         }
     }
@@ -31,7 +36,15 @@ D3ScatterPlotUtils.prototype.deepExtend = function(out) { //TODO consider using 
     return out;
 };
 
-
+D3ScatterPlotUtils.prototype.isObject = function(a) {
+    return a !== null && typeof a === 'object';
+};
+D3ScatterPlotUtils.prototype.isNumber = function(a) {
+    return !isNaN(a) && typeof a === 'number';
+};
+D3ScatterPlotUtils.prototype.isFunction = function(a) {
+    return typeof a === 'function';
+};
 function D3ScatterPlot(placeholderSelector, data, config){
     this.utils = new D3ScatterPlotUtils();
     this.placeholderSelector = placeholderSelector;
@@ -48,12 +61,14 @@ function D3ScatterPlot(placeholderSelector, data, config){
         x:{// X axis config
             label: 'X', // axis label
             value: function(d) { return d[0] }, // x value accessor
-            orient: "bottom"
+            orient: "bottom",
+            scale: "linear"
         },
         y:{// Y axis config
             label: 'Y', // axis label
             value: function(d) { return d[1] }, // y value accessor
-            orient: "left"
+            orient: "left",
+            scale: "linear"
         },
         dot:{
             radius: 2,
@@ -146,7 +161,7 @@ D3ScatterPlot.prototype.setupX = function (){
      * axis - sets up axis
      */
     x.value = conf.value;
-    x.scale = d3.scale.linear().range([0, plot.width]);
+    x.scale = d3.scale[conf.scale]().range([0, plot.width]);
     x.map = function(d) { return x.scale(x.value(d));};
     x.axis = d3.svg.axis().scale(x.scale).orient(conf.orient);
     var data = this.data;
@@ -168,7 +183,7 @@ D3ScatterPlot.prototype.setupY = function (){
      * axis - sets up axis
      */
     y.value = conf.value;
-    y.scale = d3.scale.linear().range([plot.height, 0]);
+    y.scale = d3.scale[conf.scale]().range([plot.height, 0]);
     y.map = function(d) { return y.scale(y.value(d));};
     y.axis = d3.svg.axis().scale(y.scale).orient(conf.orient);
 
@@ -243,7 +258,15 @@ D3ScatterPlot.prototype.initSvg = function (){
     var width = self.plot.width+ config.margin.left + config.margin.right;
     var height =  self.plot.height+ config.margin.top + config.margin.bottom;
     var aspect = width / height;
-    self.svg = d3.select(self.placeholderSelector).append("svg")
+
+    self.svg = d3.select(self.placeholderSelector).select("svg");
+    if(!self.svg.empty()){
+        self.svg.remove();
+
+    }
+    self.svg = d3.select(self.placeholderSelector).append("svg");
+
+    self.svg 
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", "0 0 "+" "+width+" "+height)

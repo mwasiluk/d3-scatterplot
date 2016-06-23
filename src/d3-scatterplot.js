@@ -14,12 +14,14 @@ function D3ScatterPlot(placeholderSelector, data, config){
         x:{// X axis config
             label: 'X', // axis label
             value: function(d) { return d[0] }, // x value accessor
-            orient: "bottom"
+            orient: "bottom",
+            scale: "linear"
         },
         y:{// Y axis config
             label: 'Y', // axis label
             value: function(d) { return d[1] }, // y value accessor
-            orient: "left"
+            orient: "left",
+            scale: "linear"
         },
         dot:{
             radius: 2,
@@ -112,7 +114,7 @@ D3ScatterPlot.prototype.setupX = function (){
      * axis - sets up axis
      */
     x.value = conf.value;
-    x.scale = d3.scale.linear().range([0, plot.width]);
+    x.scale = d3.scale[conf.scale]().range([0, plot.width]);
     x.map = function(d) { return x.scale(x.value(d));};
     x.axis = d3.svg.axis().scale(x.scale).orient(conf.orient);
     var data = this.data;
@@ -134,7 +136,7 @@ D3ScatterPlot.prototype.setupY = function (){
      * axis - sets up axis
      */
     y.value = conf.value;
-    y.scale = d3.scale.linear().range([plot.height, 0]);
+    y.scale = d3.scale[conf.scale]().range([plot.height, 0]);
     y.map = function(d) { return y.scale(y.value(d));};
     y.axis = d3.svg.axis().scale(y.scale).orient(conf.orient);
 
@@ -209,7 +211,15 @@ D3ScatterPlot.prototype.initSvg = function (){
     var width = self.plot.width+ config.margin.left + config.margin.right;
     var height =  self.plot.height+ config.margin.top + config.margin.bottom;
     var aspect = width / height;
-    self.svg = d3.select(self.placeholderSelector).append("svg")
+
+    self.svg = d3.select(self.placeholderSelector).select("svg");
+    if(!self.svg.empty()){
+        self.svg.remove();
+
+    }
+    self.svg = d3.select(self.placeholderSelector).append("svg");
+
+    self.svg 
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", "0 0 "+" "+width+" "+height)
