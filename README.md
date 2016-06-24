@@ -1,5 +1,7 @@
 # d3-scatterplot
 
+Project has moved to [charts-d3](https://github.com/mwasiluk/charts-d3)
+
 You can install this package through `Bower` :
 
     bower install d3-scatterplot --save
